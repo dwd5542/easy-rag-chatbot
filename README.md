@@ -1,11 +1,13 @@
 # PDF RAG 챗봇
 
 내 PDF 문서에 질문하면, 문서 내용을 근거로 답해주는 RAG 챗봇입니다.
+터미널 버전과 Streamlit 웹 앱 버전 두 가지로 구현했습니다.
 
 ## 사용 기술
 - Python
 - Google Gemini API (임베딩 모델 + 생성 모델)
 - 코사인 유사도 기반 의미 검색
+- Streamlit (웹 UI)
 
 ## 작동 방식
 
@@ -20,13 +22,19 @@
 
 전체 흐름: PDF → 글자 → 청킹 → 임베딩 → 검색 → 답변 생성
 
+웹 앱 버전에서는 PDF 읽기·청킹·임베딩을 캐싱(@st.cache_data)하여,
+질문할 때마다 반복하지 않고 한 번만 실행하도록 최적화했습니다.
+
 ## 실행 방법
-1. 필요한 라이브러리 설치: `pip install google-genai python-dotenv pypdf numpy`
+1. 필요한 라이브러리 설치:
+   `pip install google-genai python-dotenv pypdf numpy streamlit`
 2. `.env` 파일에 `GEMINI_API_KEY=발급받은키` 작성
 3. 질문할 PDF를 `doc.pdf`라는 이름으로 폴더에 저장
    (테스트용으로는 arXiv의 'Attention Is All You Need',
     arxiv.org/abs/1706.03762 같은 논문을 추천합니다.)
-4. 실행: `python rag.py`
+4. 실행:
+   - 터미널 버전: `python rag.py`
+   - 웹 앱 버전: `streamlit run app.py`
 
 ## 배운 점
 - **임베딩**: 텍스트를 의미가 담긴 숫자 벡터로 바꾸는 것. 길이는 내용과
@@ -39,3 +47,6 @@
   관련 맥락을 함께 넣어, 모델이 지어내지 않게 했다.
 - **환경변수 관리**: API 키를 코드에 직접 쓰지 않고 .env에 분리해
   load_dotenv로 불러왔다. .gitignore로 키 노출도 방지했다.
+  - **캐싱**: Streamlit은 입력마다 코드를 처음부터 다시 실행하는데,
+  무거운 임베딩 작업을 @st.cache_data로 한 번만 실행하고 결과를
+  저장해 성능을 높였다.
