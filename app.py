@@ -61,7 +61,7 @@ def search(query,chunks,chunk_embeddings,top_k=3):
         scores.append((score,chunks[i]))
 
     scores.sort(key=lambda x: x[0], reverse=True)
-    threshold=0.6
+    threshold=0.55
     selected=[chunk for score, chunk in scores if score>=threshold]
 
     if not selected:

@@ -64,7 +64,7 @@ def search(query,top_k=3):
         scores.append((score,chunks[i]))
     scores.sort(key=lambda x: x[0], reverse=True)
     print("상위 10개 점수:", [round(s, 3) for s, c in scores[:10]])   
-    threshold=0.6
+    threshold=0.55
     selected=[chunk for score, chunk in scores if score>=threshold]
 
     if not selected:
