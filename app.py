@@ -54,7 +54,13 @@ def search(query,chunks,chunk_embeddings,top_k=3):
         scores.append((score,chunks[i]))
 
     scores.sort(key=lambda x: x[0], reverse=True)
-    return [chunk for score, chunk in scores[:top_k]]
+    threshold=0.65
+    selected=[chunk for score, chunk in scores if score>=threshold]
+
+    if not selected:
+        selected=[chunk for score, chunk in scores[:top_k]]
+
+    return selected
 
 # ----- 화면 -----    
 st.title("📄 PDF RAG chatbot")

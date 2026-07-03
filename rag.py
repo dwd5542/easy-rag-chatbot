@@ -15,8 +15,10 @@ for page in reader.pages:
 print("pdf에서 뽑은 글자 수 :", len(pdf_text))
 
 chunk_size=100
+overlap=20
+step=chunk_size-overlap
 chunks=[]
-for i in range(0, len(pdf_text), chunk_size):
+for i in range(0, len(pdf_text), step):
     chunk=pdf_text[i:i+chunk_size]
     chunks.append(chunk)
 
@@ -56,8 +58,13 @@ def search(query,top_k=3):
         score=cosine_similarity(query_embedding,chunk_embeddings[i])
         scores.append((score,chunks[i]))
     scores.sort(key=lambda x: x[0], reverse=True)
+    threshold=0.65
+    selected=[chunk for score, chunk in scores if score>=threshold]
 
-    return [chunk for score, chunk in scores[:top_k]]
+    if not selected:
+        selected=[chunk for score, chunk in scores[:top_k]]
+
+    return selected
 
 while True:
     user_input = input("Enter your message(if you want to exit, type 'exit'): ")
