@@ -1,17 +1,20 @@
 # PDF RAG 챗봇
 
 내 PDF 문서에 질문하면, 문서 내용을 근거로 답해주는 RAG 챗봇입니다.
-터미널 버전과 Streamlit 웹 앱 버전 두 가지로 구현했습니다.
+터미널 버전과 Streamlit 웹 앱 버전으로 구현했으며, 웹으로 배포했습니다.
+
+**🔗 데모: https://easy-rag-chatbot-7kxhmutxqnbqjv8nyhfxz8.streamlit.app/**
 
 ## 사용 기술
 - Python
 - Google Gemini API (임베딩 모델 + 생성 모델)
 - 코사인 유사도 기반 의미 검색
-- Streamlit (웹 UI)
+- Streamlit (웹 UI + Streamlit Community Cloud 배포)
 
 ## 작동 방식
 
-1. **PDF 읽기** — PdfReader로 PDF를 읽어 하나의 문자열로 저장합니다.
+1. **PDF 업로드** — 사용자가 웹에서 PDF를 업로드하면, PdfReader로
+   읽어 하나의 문자열로 저장합니다.
 2. **청킹** — 문자열을 100글자씩 잘라 청크 리스트로 만듭니다.
 3. **임베딩** — 청크들을 Gemini 임베딩 모델로 변환합니다.
    (API가 한 번에 100개까지만 처리해서, 100개씩 나눠 전송합니다.)
@@ -26,15 +29,17 @@
 질문할 때마다 반복하지 않고 한 번만 실행하도록 최적화했습니다.
 
 ## 실행 방법
+
+**배포된 버전은 위 데모 링크에서 바로 사용할 수 있습니다.**
+
+로컬에서 실행하려면:
 1. 필요한 라이브러리 설치:
-   `pip install google-genai python-dotenv pypdf numpy streamlit`
+   `pip install -r requirements.txt`
 2. `.env` 파일에 `GEMINI_API_KEY=발급받은키` 작성
-3. 질문할 PDF를 `doc.pdf`라는 이름으로 폴더에 저장
-   (테스트용으로는 arXiv의 'Attention Is All You Need',
-    arxiv.org/abs/1706.03762 같은 논문을 추천합니다.)
-4. 실행:
+3. 실행:
    - 터미널 버전: `python rag.py`
    - 웹 앱 버전: `streamlit run app.py`
+
 
 ## 배운 점
 - **임베딩**: 텍스트를 의미가 담긴 숫자 벡터로 바꾸는 것. 길이는 내용과
@@ -54,8 +59,12 @@
   오버랩(청크를 겹치게 자르기)으로 이 손실을 줄일 수 있다.
 
 ## 개선 이력
-- **오버랩 청킹 적용**: 청크를 자를 때 이웃끼리 일부 겹치게 하여,
-  청크 경계에서 문장이 잘려 정보가 손실되는 문제를 완화했습니다.
+- **오버랩 청킹 적용**: 청크 경계에서 문장이 잘려 정보가 손실되는
+  문제를 완화했습니다.
+- **파일 업로드 기능**: 고정된 파일 대신 사용자가 직접 PDF를 업로드해
+  질문할 수 있도록 개선했습니다.
+- **웹 배포**: Streamlit Community Cloud에 배포하여 누구나 접속해
+  사용할 수 있게 했습니다.
 
 ## 향후 개선 방향
 - 유사도 임계값 기반 검색 (개수가 아닌 점수로 관련 문단 선별)
