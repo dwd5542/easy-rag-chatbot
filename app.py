@@ -73,10 +73,17 @@ def search(query,chunks,chunk_embeddings,top_k=3):
 st.title("📄 PDF RAG chatbot")
 st.write("pdf 문서에 대해 질문해보세요.")
 
-uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type="pdf")
+uploaded_files = st.file_uploader("PDF 파일을 업로드하세요", type="pdf",accept_multiple_files=True)
 
-if uploaded_file is not None:
-    chunks, chunk_embeddings = load_and_embed(uploaded_file)
+if uploaded_files:
+    all_chunks=[]
+    all_embeddings=[]
+    for uploaded_file in uploaded_files:
+        chunks, chunk_embeddings=load_and_embed(uploaded_file)
+        all_chunks.extend(chunks)
+        all_embeddings.extend(chunk_embeddings)
+    chunks=all_chunks
+    chunk_embeddings=all_embeddings
 
     user_input = st.text_input("질문:")
 
