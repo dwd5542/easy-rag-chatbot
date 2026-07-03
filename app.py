@@ -15,9 +15,11 @@ def load_and_embed(pdf_path):
     for page in reader.pages:
         pdf_text+=page.extract_text()
     
-    chunk_size=100
+    chunk_size=500
+    overlap=100
+    step=chunk_size-overlap
     chunks=[]
-    for i in range(0,len(pdf_text),chunk_size):
+    for i in range(0,len(pdf_text),step):
         chunks.append(pdf_text[i:i+chunk_size])
     
     chunk_embeddings=[]
