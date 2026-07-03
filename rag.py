@@ -14,16 +14,21 @@ for page in reader.pages:
     pdf_text += page.extract_text()
 print("pdf에서 뽑은 글자 수 :", len(pdf_text))
 
-chunk_size=100
-overlap=20
-step=chunk_size-overlap
+sentences=pdf_text.split(".")
+
+chunk_size=500
 chunks=[]
-for i in range(0, len(pdf_text), step):
-    chunk=pdf_text[i:i+chunk_size]
-    chunks.append(chunk)
+current=""
+for sentence in sentences:
+    if len(current)+len(sentence)<chunk_size:
+        current+=sentence+". "
+    else:
+        chunks.append(current)
+        current=sentence+". "
+if current:
+    chunks.append(current)
 
 print("chunk conut:", len(chunks))
-print("first chunk preview:\n", chunks[0])
 
 print("\nchunks embedding...")
 
@@ -58,12 +63,13 @@ def search(query,top_k=3):
         score=cosine_similarity(query_embedding,chunk_embeddings[i])
         scores.append((score,chunks[i]))
     scores.sort(key=lambda x: x[0], reverse=True)
-    threshold=0.65
+    print("상위 10개 점수:", [round(s, 3) for s, c in scores[:10]])   
+    threshold=0.6
     selected=[chunk for score, chunk in scores if score>=threshold]
 
     if not selected:
         selected=[chunk for score, chunk in scores[:top_k]]
-
+ 
     return selected
 
 while True:

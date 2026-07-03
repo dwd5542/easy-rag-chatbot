@@ -18,12 +18,19 @@ def load_and_embed(pdf_file):
     for page in reader.pages:
         pdf_text+=page.extract_text()
     
+    sentences=pdf_text.split(".")
+
     chunk_size=500
-    overlap=100
-    step=chunk_size-overlap
     chunks=[]
-    for i in range(0,len(pdf_text),step):
-        chunks.append(pdf_text[i:i+chunk_size])
+    current=""
+    for sentence in sentences:
+        if len(current)+len(sentence)<chunk_size:
+            current+=sentence+". "
+        else:
+            chunks.append(current)
+            current=sentence+". "
+    if current:
+        chunks.append(current)
     
     chunk_embeddings=[]
     for i in range(0,len(chunks),100):
@@ -54,7 +61,7 @@ def search(query,chunks,chunk_embeddings,top_k=3):
         scores.append((score,chunks[i]))
 
     scores.sort(key=lambda x: x[0], reverse=True)
-    threshold=0.65
+    threshold=0.6
     selected=[chunk for score, chunk in scores if score>=threshold]
 
     if not selected:
