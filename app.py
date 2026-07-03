@@ -6,6 +6,9 @@ from google import genai
 from pypdf import PdfReader
 
 load_dotenv()
+api_key=os.getenv("gemini_api_key")
+if not api_key:
+    api_key=st.secrets["gemini_api_key"]
 client=genai.Client(api_key=os.getenv("gemini_api_key"))
 
 @st.cache_data
