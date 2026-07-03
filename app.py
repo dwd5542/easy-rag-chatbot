@@ -12,8 +12,8 @@ if not api_key:
 client=genai.Client(api_key=os.getenv("gemini_api_key"))
 
 @st.cache_data
-def load_and_embed(pdf_path):
-    reader=PdfReader(pdf_path)
+def load_and_embed(pdf_file):
+    reader=PdfReader(pdf_file)
     pdf_text=""
     for page in reader.pages:
         pdf_text+=page.extract_text()
@@ -60,26 +60,29 @@ def search(query,chunks,chunk_embeddings,top_k=3):
 st.title("📄 PDF RAG chatbot")
 st.write("pdf 문서에 대해 질문해보세요.")
 
-chunks, chunk_embeddings=load_and_embed("doc.pdf")
+uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type="pdf")
 
-user_input=st.text_input("query:")
+if uploaded_file is not None:
+    chunks, chunk_embeddings = load_and_embed(uploaded_file)
 
-if user_input:
-    relevant_chunks=search(user_input,chunks,chunk_embeddings)
-    context="\n\n".join(relevant_chunks)
+    user_input = st.text_input("질문:")
 
-    prompt=f""" 다음 문서 내용을 참고해서 질문에 답해줘.
-문서에 없는 내용이면 모른다고 답해줘.
+    if user_input:
+        relevant_chunks = search(user_input, chunks, chunk_embeddings)
+        context = "\n\n".join(relevant_chunks)
 
-문서 내용:
-{context}
+        prompt=f""" 다음 문서 내용을 참고해서 질문에 답해줘.
+    문서에 없는 내용이면 모른다고 답해줘.
 
-질문:{user_input}
-"""
+    문서 내용:
+    {context}
 
-    response=client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    질문:{user_input}
+    """
 
-    st.write(response.text)
+        response=client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+
+        st.write(response.text)
